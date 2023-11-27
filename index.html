@@ -11,26 +11,49 @@
   <body>
     <main>
         <h1>Welcome to Mungki static web</h1>  
-	    <h2>test update</h2>
     </main>
-	<script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
-	<script>
-	   function fetchdata(){ 
-             $.ajax({ 
-               url: 'coba.html', 
-               type: 'get', 
-               success: function(data){ 
-                 // Perform operation on return value 
-                 alert(data); 
-               }, 
-               complete:function(data){ 
-                 setTimeout(fetchdata,3000); 
-               } 
-             }); 
-            } 
-            $(document).ready(function(){ 
-              setTimeout(fetchdata,3000); 
-            });
-	</script>
+    <div id="coba">...</div>
+    <div>
+      <canvas
+        id="myChart"
+        style="max-height: 400px; max-width: 1000px"
+      ></canvas>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      const ctx = document.getElementById("myChart");
+      let chart;
+      // chart = new Chart(ctx,{ type: "bar", data:{}, options:{},});
+      function updateChart(responseData) {
+        if (chart) {
+          // chart.destroy();
+          chart.data = responseData.data;
+          chart.option = responseData.option;
+          chart.update();
+        } else {
+          chart=new Chart(ctx,{ type: "bar", data:{ labels: ["Red", "Blue", "Yellow", "Green"], datasets: [ { label: "# of Votes", data: [12, 19, 3, 5], borderWidth: 1,}, ],}, options:{ scales:{ y:{ beginAtZero: true,},},},});
+        }
+      }
+
+      let num = 0;
+      function updatePage() {
+        $.ajax({
+          url: "data.html",
+          type: "GET",
+          async: false,
+          success: function (response) {
+            num++;
+            console.log(response);
+            var responseData = $.parseJSON(response);
+            console.log(responseData);
+            $("#coba").text("Jumlah hit " + num);
+            updateChart(responseData);
+          },
+        });
+      }
+      setInterval(updatePage, 9000);
+    </script>
   </body>
 </html>
